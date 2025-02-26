@@ -24,7 +24,6 @@ export class TranscriptionService extends EventEmitter {
       const transcript = received?.channel?.alternatives[0]?.transcript
 
 
-
       if (
         (transcript?.split(" ")?.length >= 2) ||
         transcript?.toLowerCase().includes("okay") ||
@@ -33,9 +32,8 @@ export class TranscriptionService extends EventEmitter {
         handleIntrupt();
       }
 
-      if (transcript && received.is_final) {
+      if (transcript && received.speech_final) {
         this.emit("transcription", transcript);
-
       }
     }
 
