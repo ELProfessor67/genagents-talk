@@ -6,9 +6,14 @@ import WebSocket from 'ws';
 export class TranscriptionService extends EventEmitter {
   socket;
   isOpen = false;
+  text = '';
   constructor(handleIntrupt) {
     super();
-    this.socket = new WebSocket('wss://api.deepgram.com/v1/listen?model=nova-2-phonecall&language=en&smart_format=true&sample_rate=8000&channels=1&multichannel=false&no_delay=true&endpointing=400&utterance_end_ms=1000&interim_results=true', [
+    // this.socket = new WebSocket('wss://api.deepgram.com/v1/listen?model=nova-2-phonecall&language=en&smart_format=true&sample_rate=8000&channels=1&multichannel=false&no_delay=true&endpointing=400&utterance_end_ms=1000&interim_results=true', [
+    //   'token',
+    //   process.env.DEEPGRAM_API_KEY,
+    // ]);
+    this.socket = new WebSocket('wss://api.deepgram.com/v1/listen?model=nova-2-phonecall&language=en&smart_format=true&sample_rate=8000&channels=1&multichannel=false&no_delay=true&endpointing=300', [
       'token',
       process.env.DEEPGRAM_API_KEY,
     ]);
@@ -22,7 +27,7 @@ export class TranscriptionService extends EventEmitter {
       const received = JSON.parse(message.data)
       if (!received?.channel?.alternatives) return;
       const transcript = received?.channel?.alternatives[0]?.transcript
-
+      if(transcript) this.text += ` ${transcript}`;
 
       if (
         (transcript?.split(" ")?.length >= 2) ||
@@ -32,8 +37,9 @@ export class TranscriptionService extends EventEmitter {
         handleIntrupt();
       }
 
-      if (transcript && received.is_final) {
-        this.emit("transcription", transcript);
+      if (transcript && received.speech_final) {
+        this.emit("transcription", this.text);
+        this.text = '';
       }
     }
 

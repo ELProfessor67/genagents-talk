@@ -11,7 +11,7 @@ import VolMeterWorket from '@/services/workers/volMeter';
 const App = () => {
   const [isAISpeaking, setIsAISpeaking] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [state,setState] = useState('Listing...');
+  const [state,setState] = useState('Connection...');
   const mediaRecorderRef = useRef(null);
   const websocketRef = useRef();
   // const soundBufferRef = useRef(null);
