@@ -25,7 +25,7 @@ class Conversation:
         return {"message": "Conversation history cleared."}
 
 # Initialize conversation
-agent_folder = "agent_bank/populations/gss_agents/fd7a21ff-0d6a-4ed5-bbb4-a548a8178dd0"
+agent_folder = "agent_bank/populations/single_agent/01fd7d2a-0357-4c1b-9f3e-8eade2d537ae"
 conversation = Conversation(agent_folder, interviewer_name="Jane Doe")
 
 @app.route("/chat", methods=["POST"])

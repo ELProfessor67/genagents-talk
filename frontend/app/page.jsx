@@ -12,12 +12,12 @@ export default function Page() {
           {/* TalkBetter Section */}
           <div className="bg-white overflow-hidden shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Jose Lopez</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Joon Park</h2>
               <p className="text-gray-600 mb-4">
-              Jose Lopez, 70 years old, retired and enjoying life in San Jose, CA. I love spending time with family and am interested in gardening as a new hobby. I value moderate political views and have a deep appreciation for my Catholic faith.
+                I'm Joon Park, a 30-year-old PhD student in computer science at Stanford, focusing on AI and human-computer interaction. I was born in Korea and moved to the U.S. when I was 12. I have a passion for research, art, and nature, and I value meaningful work and the connections I have with my close friends and family.
               </p>
               <Link
-                href="/talkbetter?name=Jose Lopez"
+                href="/talkbetter?name=Joon Park"
                 className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Talk Know
