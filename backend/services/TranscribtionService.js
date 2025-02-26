@@ -32,7 +32,7 @@ export class TranscriptionService extends EventEmitter {
         handleIntrupt();
       }
 
-      if (transcript && received.speech_final) {
+      if (transcript && received.is_final) {
         this.emit("transcription", transcript);
       }
     }
