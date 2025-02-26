@@ -11,15 +11,18 @@ import VolMeterWorket from '@/services/workers/volMeter';
 const App = () => {
   const [isAISpeaking, setIsAISpeaking] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [state,setState] = useState('Listing...');
   const mediaRecorderRef = useRef(null);
   const websocketRef = useRef();
-  const soundBufferRef = useRef(null);
-  const audioStreamerRef = useRef(null);
+  // const soundBufferRef = useRef(null);
+  // const audioStreamerRef = useRef(null);
   const router = useRouter();
   const streamRef = useRef(null);
-  const [volume,setVolume] = useState(0);
+  const [volume, setVolume] = useState(0);
   const searchParams = useSearchParams();
   const botname = searchParams.get('name');
+  const audioRef = useRef(null)
+
 
 
 
@@ -40,7 +43,7 @@ const App = () => {
 
   const endCall = useCallback(() => {
     websocketRef.current?.close();
-    soundBufferRef.current.clearQueChunks();
+    // soundBufferRef.current?.clearQueChunks();
     router.push('/');
   }, []);
 
@@ -64,26 +67,27 @@ const App = () => {
   // useEffect(() => {
   //   if (!audioStreamerRef.current) {
   //     audioContext({ id: "audio-out" }).then((audioCtx) => {
-  //       audioStreamerRef.current = new AudioStreamer(audioCtx);
+  //       audioStreamerRef.current = new AudioStreamer(audioCtx, setIsAISpeaking);
   //       audioStreamerRef.current
   //         .addWorklet("vumeter-out", VolMeterWorket, (ev) => {
   //           setVolume(ev.data.volume);
   //         })
-  //           .then(() => {
-  //             console.log('successfully initialize')
-  //             // Successfully added worklet
-  //           });
+  //         .then(() => {
+  //           console.log('successfully initialize')
+  //           // Successfully added worklet
+  //         });
   //     });
   //   }
   // }, [audioStreamerRef]);
 
   useEffect(() => {
+    audioRef.current = new Audio();
     const ws = new WebSocket(process.env.NEXT_PUBLIC_MEDIA_SERVER_URL);
     websocketRef.current = ws;
     // const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 
-    soundBufferRef.current = new RealTimeAudioPlayer(setIsAISpeaking);
+    // soundBufferRef.current = new RealTimeAudioPlayer(setIsAISpeaking);
 
 
 
@@ -92,14 +96,35 @@ const App = () => {
       const data = JSON.parse(event.data);
       switch (data.event) {
         case 'media':
-          const base64Audio = data.media.payload;
+          // const base64Audio = data.media.payload;
+          // console.log('media coming...');
           // const buffer = base64ToArrayBuffer(base64Audio);
           // audioStreamerRef.current?.addPCM16(new Uint8Array(buffer));
-          soundBufferRef.current.addAudioChunk(base64Audio);
+          // soundBufferRef.current.addAudioChunk(base64Audio);
           break;
         case 'clear':
           // audioStreamerRef.current?.stop();
-          soundBufferRef.current.clearQueChunks();
+          // soundBufferRef.current.clearQueChunks();
+          audioRef.current.pause();
+          audioRef.current.src = undefined;
+          setIsAISpeaking(false);
+          setState("Listning...")
+          break;
+
+        case 'audio':
+          const audiodata = data.media.payload;
+          audioRef.current.src = audiodata;
+          setState("Speaking...")
+          audioRef.current.onended = () => {
+            setIsAISpeaking(false);
+            setState("Listning...")
+          }
+          audioRef.current.play();
+          setIsAISpeaking(true);
+          break;
+        case 'state':
+          const value = data.state.value;
+          setState(value);
           break;
       }
     };
@@ -171,6 +196,7 @@ const App = () => {
               </div>
             </div>
             <h2 className="text-2xl font-semibold text-indigo-700">{botname || "Genagents"}</h2>
+            <h2 className="text-xl font-normal text-red-600">{state}</h2>
             {/* Audio Visualizer */}
             <div className="w-full h-24 bg-gray-100 rounded-lg overflow-hidden grid place-items-center">
 

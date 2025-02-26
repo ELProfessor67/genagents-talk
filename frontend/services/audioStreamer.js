@@ -6,8 +6,8 @@ import {
 export class AudioStreamer {
     audioQueue = []
     isPlaying = false
-    sampleRate = 24000
-    bufferSize = 7680
+    sampleRate = 8000
+    bufferSize = 8000
     processingBuffer = new Float32Array(0)
     scheduledTime = 0
     isStreamComplete = false
@@ -17,12 +17,13 @@ export class AudioStreamer {
 
     onComplete = () => { }
 
-    constructor(context) {
+    constructor(context,setIsAISpeaking) {
         this.context = context
         this.gainNode = this.context.createGain()
         this.source = this.context.createBufferSource()
         this.gainNode.connect(this.context.destination)
         this.addPCM16 = this.addPCM16.bind(this)
+        this.setIsAISpeaking = setIsAISpeaking;
     }
 
     async addWorklet(workletName, workletSrc, handler) {
@@ -84,6 +85,7 @@ export class AudioStreamer {
 
         if (!this.isPlaying) {
             this.isPlaying = true
+            this.setIsAISpeaking(true)
             // Initialize scheduledTime only when we start playing
             this.scheduledTime = this.context.currentTime + this.initialBufferTime
             this.scheduleNextBuffer()
@@ -100,6 +102,9 @@ export class AudioStreamer {
         return audioBuffer
     }
 
+
+    
+
     scheduleNextBuffer() {
         const SCHEDULE_AHEAD_TIME = 0.2
 
@@ -109,7 +114,7 @@ export class AudioStreamer {
         ) {
             const audioData = this.audioQueue.shift()
             const audioBuffer = this.createAudioBuffer(audioData)
-            const source = this.context.createBufferSource()
+            const source = this.context.createBufferSource()           
 
             if (this.audioQueue.length === 0) {
                 if (this.endOfQueueAudioSource) {
@@ -161,6 +166,7 @@ export class AudioStreamer {
         if (this.audioQueue.length === 0 && this.processingBuffer.length === 0) {
             if (this.isStreamComplete) {
                 this.isPlaying = false
+                this.setIsAISpeaking(false)
                 if (this.checkInterval) {
                     clearInterval(this.checkInterval)
                     this.checkInterval = null
@@ -189,6 +195,7 @@ export class AudioStreamer {
 
     stop() {
         this.isPlaying = false
+        this.setIsAISpeaking(false)
         this.isStreamComplete = true
         this.audioQueue = []
         this.processingBuffer = new Float32Array(0)

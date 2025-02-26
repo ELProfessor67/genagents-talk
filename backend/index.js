@@ -5,7 +5,7 @@ import fastifyWs from '@fastify/websocket';
 import fastifySocketIo from 'fastify-socket.io';
 import { TranscriptionService } from './services/TranscribtionService.js';
 import { WELCOME_MESSAGE } from './constant/promptConstant.js';
-import { textToSpeechService } from './services/realTimeSpeechService.js';
+import { getAudioBase64, textToSpeechService } from './services/realTimeSpeechService.js';
 import { generateResponse } from './services/promtLLMservice.js';
 import fastifyCors from 'fastify-cors';
 import { clearHistory } from './services/genagentService.js';
@@ -52,7 +52,7 @@ fastify.get('/', async (request, reply) => {
 
 // WebSocket route for talk better
 fastify.register(async (fastify) => {
-    fastify.get('/media-stream', { websocket: true }, (connection, req) => {
+    fastify.get('/media-stream', { websocket: true }, async (connection, req) => {
         const config = {
             stopStream: false,
             assistantSpeaking: false,
@@ -63,7 +63,20 @@ fastify.register(async (fastify) => {
         }
 
         const transcriptionService = new TranscriptionService(handleIntrupt);
-        const TTSService = textToSpeechService(connection, config, WELCOME_MESSAGE);
+        // const TTSService = textToSpeechService(connection, config, WELCOME_MESSAGE);
+
+
+
+        //send initial audio
+        const audiodata = await getAudioBase64(WELCOME_MESSAGE);
+        const sendData = {
+            event: 'audio',
+            media: {
+                payload: audiodata
+            }
+        };
+        connection.send(JSON.stringify(sendData));
+
 
         // Handle incoming messages from Twilio
         connection.on('message', async (message) => {
@@ -109,15 +122,25 @@ fastify.register(async (fastify) => {
                 );
             }
 
+            connection.send(
+                JSON.stringify({
+                    event: 'state',
+                    state: {
+                        value: "Thinking..."
+                    }
+                })
+            );
 
-            const assistantResponse = await generateResponse(TTSService, config, transcript_text);
+
+            const assistantResponse = await generateResponse(config, transcript_text, connection);
+            
             console.log('Assistant', assistantResponse);
         })
 
         // Handle connection close and log transcript
         connection.on('close', async () => {
             console.log(`Client disconnected`);
-            TTSService.close();
+            // TTSService.close();
             transcriptionService.close();
             clearHistory()
         });
