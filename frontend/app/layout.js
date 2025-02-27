@@ -4,8 +4,8 @@ import { Suspense } from "react";
 
 
 export const metadata = {
-  title: "AI Chatting Bot",
-  description: "AI Chatting Bot.",
+  title: "Persona Simulation",
+  description: "persona simulation.",
 };
 
 export default function RootLayout({ children }) {
