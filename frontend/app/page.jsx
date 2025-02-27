@@ -12,9 +12,9 @@ export default function Page() {
           {/* TalkBetter Section */}
           <div className="bg-white overflow-hidden shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Joon Park</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Persona Ai</h2>
               <p className="text-gray-600 mb-4">
-                I'm Joon Park, a 30-year-old PhD student in computer science at Stanford, focusing on AI and human-computer interaction. I was born in Korea and moved to the U.S. when I was 12. I have a passion for research, art, and nature, and I value meaningful work and the connections I have with my close friends and family.
+                Persona Ai is an intelligent assistant designed to understand and interact like a real person. It adapts to conversations, provides insightful responses, and enhances user experiences with its advanced AI capabilities.
               </p>
               <Link
                 href="/talkbetter?name=Joon Park"
