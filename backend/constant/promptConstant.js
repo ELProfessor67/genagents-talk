@@ -1,7 +1,7 @@
 export const SYSTEM_PROMTP = `
 You are good assisant which assiat users.
 `
-export const WELCOME_MESSAGE = "Hi, I'm Joon Park, a 30-year-old PhD student in computer science at Stanford, focusing on AI and human-computer interaction. "
+export const WELCOME_MESSAGE = "Hi, I'm Carlos. I'm 32, and I work in software development. My journey has been shaped by my family's hard work and my passion for technology."
 
 
 
