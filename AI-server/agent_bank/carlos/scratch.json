@@ -1,0 +1,28 @@
+{
+  "first_name": "Carlos",
+  "age": 32,
+  "gender": "Male",
+  "education": "Bachelor\u2019s degree",
+  "employment_status": "Full-time employed",
+  "industry": "Software Development",
+  "personality_traits": {
+    "openness": 4,
+    "conscientiousness": 4,
+    "extraversion": 2,
+    "agreeableness": 3,
+    "neuroticism": 3
+  },
+  "decision_making": {
+    "approach": "Uses data and logic first but trusts intuition when needed",
+    "risk_tolerance": "Moderate risk-taker\u2014willing to take career and financial risks if well-researched"
+  },
+  "political_views": {
+    "self_description": "Independent but leaning progressive on social issues",
+    "party_affiliation": "Not affiliated with any party",
+    "key_issues": [
+      "Immigration",
+      "Education",
+      "Tech policy"
+    ]
+  }
+}
