@@ -62,10 +62,18 @@ fastify.register(async (fastify) => {
             }
         }
 
+        let timeOutRef = null;
+
+
+
+        
+
+        
+
         const transcriptionService = new TranscriptionService(handleIntrupt);
         // const TTSService = textToSpeechService(connection, config, WELCOME_MESSAGE);
 
-
+       
 
         //send initial audio
         const audiodata = await getAudioBase64(WELCOME_MESSAGE);
@@ -76,6 +84,13 @@ fastify.register(async (fastify) => {
             }
         };
         connection.send(JSON.stringify(sendData));
+
+      
+      
+        
+            
+       
+
 
 
         // Handle incoming messages from Twilio
@@ -88,7 +103,6 @@ fastify.register(async (fastify) => {
                         config.user.name = data?.start?.user?.name;
                         config.user.email = data?.start?.user?.email;
                         console.log('user conneted', config.user.name)
-
                         break;
                     case 'media':
                         transcriptionService.send(data.media.payload);
@@ -108,10 +122,17 @@ fastify.register(async (fastify) => {
             );
         }
 
+       
+
+       
+        
+        
+      
+
         transcriptionService.on('transcription', async (transcript_text) => {
             if (!transcript_text) return
-
             console.log('User', transcript_text);
+           
 
             if (transcript_text) {
                 config.stopStream = true;
@@ -137,6 +158,9 @@ fastify.register(async (fastify) => {
             console.log('Assistant', assistantResponse);
         })
 
+
+
+
         // Handle connection close and log transcript
         connection.on('close', async () => {
             console.log(`Client disconnected`);
@@ -144,6 +168,26 @@ fastify.register(async (fastify) => {
             transcriptionService.close();
             clearHistory()
         });
+
+
+        // const questionAudio = await getAudioBase64("Is there anything I can help you with?");
+      
+        // function handleSendAfter5min(){
+        //     if(timeOutRef) clearTimeout(timeOutRef);
+        //     console.log("handleSendAfter5min")
+        //     timeOutRef = setTimeout(() => {
+        //         console.log("handleSendAfter5min after")
+        //         const sendData = {
+        //             event: 'audio',
+        //             media: {
+        //                 payload: questionAudio
+        //             }
+        //         };
+        //         connection.send(JSON.stringify(sendData));
+        //         handleSendAfter5min();
+        //     },50000)
+        // }
+        // handleSendAfter5min()
     });
 });
 

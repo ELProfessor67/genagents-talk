@@ -7,11 +7,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { audioContext, base64ToArrayBuffer } from '@/utils/utils';
 import { AudioStreamer } from '@/services/audioStreamer';
 import VolMeterWorket from '@/services/workers/volMeter';
+import { waitingBase64 } from '@/constant/waiting';
 
 const App = () => {
   const [isAISpeaking, setIsAISpeaking] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [state,setState] = useState('Connection...');
+  const [state, setState] = useState('Connection...');
   const mediaRecorderRef = useRef(null);
   const websocketRef = useRef();
   // const soundBufferRef = useRef(null);
@@ -22,6 +23,7 @@ const App = () => {
   const searchParams = useSearchParams();
   const botname = searchParams.get('name');
   const audioRef = useRef(null)
+  const timeoutRef = useRef();
 
 
 
@@ -80,7 +82,25 @@ const App = () => {
   //   }
   // }, [audioStreamerRef]);
 
+  const handleAudio = (data) => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    const audiodata = data.media.payload;
+    audioRef.current.src = audiodata;
+    setState("Speaking...")
+    audioRef.current.onended = () => {
+      setIsAISpeaking(false);
+      setState("Listning...");
+      timeoutRef.current = setTimeout(() => {
+        audioRef.current.src = waitingBase64;
+        audioRef.current.play();
+      }, 10000)
+    }
+    audioRef.current.play();
+    setIsAISpeaking(true);
+  }
+
   useEffect(() => {
+    if (websocketRef.current) return;
     audioRef.current = new Audio();
     const ws = new WebSocket(process.env.NEXT_PUBLIC_MEDIA_SERVER_URL);
     websocketRef.current = ws;
@@ -112,18 +132,13 @@ const App = () => {
           break;
 
         case 'audio':
-          const audiodata = data.media.payload;
-          audioRef.current.src = audiodata;
-          setState("Speaking...")
-          audioRef.current.onended = () => {
-            setIsAISpeaking(false);
-            setState("Listning...")
-          }
-          audioRef.current.play();
-          setIsAISpeaking(true);
+          handleAudio(data)
           break;
         case 'state':
           const value = data.state.value;
+          if(value == "Thinking..."){
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+          }
           setState(value);
           break;
       }
@@ -133,9 +148,9 @@ const App = () => {
       console.log('close');
     }
 
-    return () => {
-      ws.close();
-    };
+    // return () => {
+    //   ws.close();
+    // };
   }, []);
 
   const sendStream = async () => {
